@@ -30,6 +30,34 @@ export const AppReducer = (state, action) => {
                     ...state
                 }
             }
+            case 'SUB_EXPENSE':
+            // Calculate the total budget by subtracting the costs of all expenses in the current state.
+            let total_budget2 = state.expenses.reduce(
+                (previousExp, currentExp) => {
+                    return previousExp - currentExp.cost;
+                }, 0
+            );
+
+            // Subtract the cost of the expense from the action payload from the total budget.
+            total_budget2 = total_budget2 - action.payload.cost;
+
+            // Change the action type to "DONE" (though this doesn't have any direct impact).
+            action.type = "DONE";
+
+            // Update the cost of the existing expense if it already exists in the state.
+            state.expenses.map((currentExp) => {
+                if (currentExp.name === action.payload.name) {
+                    // Ensure that the cost doesn't go below zero.
+                    currentExp.cost = Math.max(0, currentExp.cost - action.payload.cost);
+                }
+                return currentExp;
+            });
+
+            // Return a new state object with the updated expenses.
+            return {
+                ...state,
+            };
+
             case 'RED_EXPENSE':
                 const red_expenses = state.expenses.map((currentExp)=> {
                     if (currentExp.name === action.payload.name && currentExp.cost - action.payload.cost >= 0) {
